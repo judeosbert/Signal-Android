@@ -447,7 +447,7 @@ public class RecipientPreferenceActivity extends PassphraseRequiredActionBarActi
     }
 
     private @NonNull String formatAddress(@NonNull Address address) {
-      if      (address.isPhone()) return PhoneNumberUtils.formatNumber(address.toPhoneString());
+      if      (address.isPhone()) return "";
       else if (address.isEmail()) return address.toEmailString();
       else                        return "";
     }

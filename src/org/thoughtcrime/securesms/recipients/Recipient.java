@@ -297,7 +297,7 @@ public class Recipient implements RecipientModifiedListener {
       return Util.join(names, ", ");
     }
 
-    return this.name;
+    return "---oooo---";
   }
 
   public void setName(@Nullable String name) {
