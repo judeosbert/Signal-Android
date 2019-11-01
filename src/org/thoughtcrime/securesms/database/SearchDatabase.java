@@ -1,6 +1,8 @@
 package org.thoughtcrime.securesms.database;
 
 import android.content.Context;
+import android.text.TextUtils;
+
 import androidx.annotation.NonNull;
 
 import com.annimon.stream.Stream;
@@ -9,9 +11,6 @@ import net.sqlcipher.Cursor;
 import net.sqlcipher.database.SQLiteDatabase;
 
 import org.thoughtcrime.securesms.database.helpers.SQLCipherOpenHelper;
-import org.thoughtcrime.securesms.util.Util;
-
-import java.util.List;
 
 /**
  * Contains all databases necessary for full-text search (FTS).
@@ -21,12 +20,12 @@ public class SearchDatabase extends Database {
   public static final String SMS_FTS_TABLE_NAME = "sms_fts";
   public static final String MMS_FTS_TABLE_NAME = "mms_fts";
 
-  public static final String ID                   = "rowid";
-  public static final String BODY                 = MmsSmsColumns.BODY;
-  public static final String THREAD_ID            = MmsSmsColumns.THREAD_ID;
-  public static final String SNIPPET              = "snippet";
-  public static final String CONVERSATION_ADDRESS = "conversation_address";
-  public static final String MESSAGE_ADDRESS      = "message_address";
+  public static final String ID                     = "rowid";
+  public static final String BODY                   = MmsSmsColumns.BODY;
+  public static final String THREAD_ID              = MmsSmsColumns.THREAD_ID;
+  public static final String SNIPPET                = "snippet";
+  public static final String CONVERSATION_RECIPIENT = "conversation_recipient";
+  public static final String MESSAGE_RECIPIENT      = "message_recipient";
 
   public static final String[] CREATE_TABLE = {
       "CREATE VIRTUAL TABLE " + SMS_FTS_TABLE_NAME + " USING fts5(" + BODY + ", " + THREAD_ID + " UNINDEXED, content=" + SmsDatabase.TABLE_NAME + ", content_rowid=" + SmsDatabase.ID + ");",
@@ -59,8 +58,8 @@ public class SearchDatabase extends Database {
 
   private static final String MESSAGES_QUERY =
       "SELECT " +
-        ThreadDatabase.TABLE_NAME + "." + ThreadDatabase.ADDRESS + " AS " + CONVERSATION_ADDRESS + ", " +
-        MmsSmsColumns.ADDRESS + " AS " + MESSAGE_ADDRESS + ", " +
+        ThreadDatabase.TABLE_NAME + "." + ThreadDatabase.RECIPIENT_ID + " AS " + CONVERSATION_RECIPIENT + ", " +
+        MmsSmsColumns.RECIPIENT_ID + " AS " + MESSAGE_RECIPIENT + ", " +
         "snippet(" + SMS_FTS_TABLE_NAME + ", -1, '', '', '...', 7) AS " + SNIPPET + ", " +
         SmsDatabase.TABLE_NAME + "." + SmsDatabase.DATE_RECEIVED + " AS " + MmsSmsColumns.NORMALIZED_DATE_RECEIVED + ", " +
         SMS_FTS_TABLE_NAME + "."  + THREAD_ID + " " +
@@ -70,8 +69,8 @@ public class SearchDatabase extends Database {
       "WHERE " + SMS_FTS_TABLE_NAME + " MATCH ? " +
       "UNION ALL " +
       "SELECT " +
-        ThreadDatabase.TABLE_NAME + "." + ThreadDatabase.ADDRESS + " AS " + CONVERSATION_ADDRESS + ", " +
-        MmsSmsColumns.ADDRESS + " AS " + MESSAGE_ADDRESS + ", " +
+        ThreadDatabase.TABLE_NAME + "." + ThreadDatabase.RECIPIENT_ID + " AS " + CONVERSATION_RECIPIENT + ", " +
+        MmsSmsColumns.RECIPIENT_ID + " AS " + MESSAGE_RECIPIENT + ", " +
         "snippet(" + MMS_FTS_TABLE_NAME + ", -1, '', '', '...', 7) AS " + SNIPPET + ", " +
         MmsDatabase.TABLE_NAME + "." + MmsDatabase.DATE_RECEIVED + " AS " + MmsSmsColumns.NORMALIZED_DATE_RECEIVED + ", " +
         MMS_FTS_TABLE_NAME + "." + THREAD_ID + " " +
@@ -84,8 +83,8 @@ public class SearchDatabase extends Database {
 
   private static final String MESSAGES_FOR_THREAD_QUERY =
       "SELECT " +
-          ThreadDatabase.TABLE_NAME + "." + ThreadDatabase.ADDRESS + " AS " + CONVERSATION_ADDRESS + ", " +
-          MmsSmsColumns.ADDRESS + " AS " + MESSAGE_ADDRESS + ", " +
+          ThreadDatabase.TABLE_NAME + "." + ThreadDatabase.RECIPIENT_ID + " AS " + CONVERSATION_RECIPIENT + ", " +
+          MmsSmsColumns.RECIPIENT_ID + " AS " + MESSAGE_RECIPIENT + ", " +
           "snippet(" + SMS_FTS_TABLE_NAME + ", -1, '', '', '...', 7) AS " + SNIPPET + ", " +
           SmsDatabase.TABLE_NAME + "." + SmsDatabase.DATE_RECEIVED + " AS " + MmsSmsColumns.NORMALIZED_DATE_RECEIVED + ", " +
           SMS_FTS_TABLE_NAME + "." + THREAD_ID + " " +
@@ -95,8 +94,8 @@ public class SearchDatabase extends Database {
         "WHERE " + SMS_FTS_TABLE_NAME + " MATCH ? AND " + SmsDatabase.TABLE_NAME + "." + MmsSmsColumns.THREAD_ID + " = ? " +
         "UNION ALL " +
         "SELECT " +
-          ThreadDatabase.TABLE_NAME + "." + ThreadDatabase.ADDRESS + " AS " + CONVERSATION_ADDRESS + ", " +
-          MmsSmsColumns.ADDRESS + " AS " + MESSAGE_ADDRESS + ", " +
+          ThreadDatabase.TABLE_NAME + "." + ThreadDatabase.RECIPIENT_ID + " AS " + CONVERSATION_RECIPIENT + ", " +
+          MmsSmsColumns.RECIPIENT_ID + " AS " + MESSAGE_RECIPIENT + ", " +
           "snippet(" + MMS_FTS_TABLE_NAME + ", -1, '', '', '...', 7) AS " + SNIPPET + ", " +
           MmsDatabase.TABLE_NAME + "." + MmsDatabase.DATE_RECEIVED + " AS " + MmsSmsColumns.NORMALIZED_DATE_RECEIVED + ", " +
           MMS_FTS_TABLE_NAME + "." + THREAD_ID + " " +
@@ -112,31 +111,48 @@ public class SearchDatabase extends Database {
   }
 
   public Cursor queryMessages(@NonNull String query) {
-    SQLiteDatabase db          = databaseHelper.getReadableDatabase();
-    String         prefixQuery = adjustQuery(query);
+    SQLiteDatabase db                  = databaseHelper.getReadableDatabase();
+    String         fullTextSearchQuery = createFullTextSearchQuery(query);
 
-    Cursor cursor = db.rawQuery(MESSAGES_QUERY, new String[] { prefixQuery, prefixQuery });
+    if (TextUtils.isEmpty(fullTextSearchQuery)) {
+      return null;
+    }
+
+    Cursor cursor = db.rawQuery(MESSAGES_QUERY, new String[] { fullTextSearchQuery,
+                                                               fullTextSearchQuery });
+
     setNotifyConverationListListeners(cursor);
     return cursor;
   }
 
   public Cursor queryMessages(@NonNull String query, long threadId) {
-    SQLiteDatabase db          = databaseHelper.getReadableDatabase();
-    String         prefixQuery = adjustQuery(query);
+    SQLiteDatabase db                  = databaseHelper.getReadableDatabase();
+    String         fullTextSearchQuery = createFullTextSearchQuery(query);
 
-    Cursor cursor = db.rawQuery(MESSAGES_FOR_THREAD_QUERY, new String[] { prefixQuery, String.valueOf(threadId), prefixQuery, String.valueOf(threadId) });
+    if (TextUtils.isEmpty(fullTextSearchQuery)) {
+      return null;
+    }
+
+    Cursor cursor = db.rawQuery(MESSAGES_FOR_THREAD_QUERY, new String[] { fullTextSearchQuery,
+                                                                          String.valueOf(threadId),
+                                                                          fullTextSearchQuery,
+                                                                          String.valueOf(threadId) });
+
     setNotifyConverationListListeners(cursor);
     return cursor;
-
   }
 
-  private String adjustQuery(@NonNull String query) {
-    List<String> tokens      = Stream.of(query.split(" ")).filter(s -> s.trim().length() > 0).toList();
-    String       prefixQuery = Util.join(tokens, "* ");
+  private static String createFullTextSearchQuery(@NonNull String query) {
+    return Stream.of(query.split(" "))
+                 .map(String::trim)
+                 .filter(s -> s.length() > 0)
+                 .map(SearchDatabase::fullTextSearchEscape)
+                 .collect(StringBuilder::new, (sb, s) -> sb.append(s).append("* "))
+                 .toString();
+  }
 
-    prefixQuery += "*";
-
-    return prefixQuery;
+  private static String fullTextSearchEscape(String s) {
+    return "\"" + s.replace("\"", "\"\"") + "\"";
   }
 }
 

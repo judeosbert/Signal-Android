@@ -11,6 +11,8 @@
   <string name="AbstractNotificationBuilder_new_message">Nova mensagem</string>
   <!--AlbumThumbnailView-->
   <string name="AlbumThumbnailView_plus">\+%d</string>
+  <!--ApplicationMigrationActivity-->
+  <string name="ApplicationMigrationActivity__signal_is_updating">O Signal está a atualizar...</string>
   <!--ApplicationPreferencesActivity-->
   <string name="ApplicationPreferencesActivity_currently_s">Actualmente: %s</string>
   <string name="ApplicationPreferenceActivity_you_havent_set_a_passphrase_yet">Ainda não definiu uma frase-passe!</string>
@@ -62,6 +64,7 @@
   <string name="AttachmentManager_signal_requires_the_camera_permission_in_order_to_take_photos_but_it_has_been_permanently_denied">O Signal requer permissão de acesso à câmara para poder tirar fotos, mas esta foi negada permanentemente. Por favor aceda às definições da aplicação, seleccione \"Permissões\" e ative \"Câmara\".</string>
   <!--AttachmentUploadJob-->
   <string name="AttachmentUploadJob_uploading_media">A carregar média...</string>
+  <string name="AttachmentUploadJob_compressing_video_start">A comprimir vídeo...</string>
   <!--AudioSlidePlayer-->
   <string name="AudioSlidePlayer_error_playing_audio">Erro ao reproduzir áudio!</string>
   <!--BlockedContactsActivity-->
@@ -76,6 +79,10 @@
   <!--CameraActivity-->
   <string name="CameraActivity_image_save_failure">Não foi possível guardar a imagem.</string>
   <!--CameraXFragment-->
+  <string name="CameraXFragment_tap_for_photo_hold_for_video">Toque para fotografia, mantenha para vídeo</string>
+  <string name="CameraXFragment_capture_description">Capturar</string>
+  <string name="CameraXFragment_change_camera_description">Alterar câmara</string>
+  <string name="CameraXFragment_open_gallery_description">Abrir galeria</string>
   <!--CameraContacts-->
   <string name="CameraContacts_recent_contacts">Contactos recentes</string>
   <string name="CameraContacts_signal_contacts">Contactos Signal</string>
@@ -170,6 +177,9 @@
   <string name="ConversationActivity_to_capture_photos_and_video_allow_signal_access_to_the_camera">Para tirar fotos e filmar vídeos, dê permissões ao Signal para acesso à câmara.</string>
   <string name="ConversationActivity_signal_needs_the_camera_permission_to_take_photos_or_video">O Signal requer permissão de acesso à câmara para tirar fotos ou vídeo, mas esta foi negada permanentemente. Por favor, aceda às definições da aplicação, seleccione \"Permissões\" e ative \"Câmara\".</string>
   <string name="ConversationActivity_signal_needs_camera_permissions_to_take_photos_or_video">O Signal requer permissão de acesso à Câmara para tirar fotos ou vídeo</string>
+  <string name="ConversationActivity_enable_the_microphone_permission_to_capture_videos_with_sound">Ative a permissão do microfone para poder capturar vídeos com som.</string>
+  <string name="ConversationActivity_signal_needs_the_recording_permissions_to_capture_video">O Sinal necessita de permissões de microfone para poder gravar vídeos. mas elas foram negadas. Por favor, continue para as definições da aplicação. selecione \"Permissões\", e ative \"Microfone\" e \"Câmara\"</string>
+  <string name="ConversationActivity_signal_needs_recording_permissions_to_capture_video">O Signal necessita de permissões de microfone para poder gravar vídeos.</string>
   <string name="ConversationActivity_quoted_contact_message">%1$s%2$s</string>
   <string name="ConversationActivity_signal_cannot_sent_sms_mms_messages_because_it_is_not_your_default_sms_app">O Signal não consegue enviar mensagens SMS/MMS porque não é a sua aplicação padrão para lidar com SMS. Deseja alterar isto nas definições do Android?</string>
   <string name="ConversationActivity_yes">Sim</string>
@@ -218,6 +228,9 @@
   <string name="ConversationFragment_deleting_messages">A eliminar mensagens...</string>
   <string name="ConversationFragment_quoted_message_not_found">Não foi encontrada a mensagem original</string>
   <string name="ConversationFragment_quoted_message_no_longer_available">A mensagem original já não está disponível</string>
+  <string name="ConversationFragment_failed_to_open_message">Falha ao abrir a mensagem</string>
+  <string name="ConversationFragment_you_can_swipe_to_the_right_reply">Pode deslizar qualquer mensagem para a direita para responder rapidamente</string>
+  <string name="ConversationFragment_you_can_swipe_to_the_left_reply">Pode deslizar qualquer mensagem para a esquerda para responder rapidamente</string>
   <!--ConversationListActivity-->
   <string name="ConversationListActivity_there_is_no_browser_installed_on_your_device">Não existe nenhum navegador instalado no seu dispositivo.</string>
   <!--ConversationListFragment-->
@@ -256,13 +269,14 @@
   <string name="CreateProfileActivity_profile_name">Nome de perfil</string>
   <string name="CreateProfileActivity_set_up_your_profile">Configurar o seu perfil</string>
   <string name="CreateProfileActivity_signal_profiles_are_end_to_end_encrypted">Os perfis do Signal são encriptados de extremo-a-extremo e o serviço do Signal nunca tem acesso a esta informação.</string>
+  <string name="CreateProfileActivity_set_avatar_description">Definir avatar</string>
   <!--CustomDefaultPreference-->
   <string name="CustomDefaultPreference_using_custom">Usar a opção personalizada: %s</string>
   <string name="CustomDefaultPreference_using_default">A usar a opção predefinida: %s</string>
   <string name="CustomDefaultPreference_none">Nenhum</string>
   <!--DateUtils-->
   <string name="DateUtils_just_now">Agora</string>
-  <string name="DateUtils_minutes_ago">%d min</string>
+  <string name="DateUtils_minutes_ago">%dm</string>
   <string name="DateUtils_today">Hoje</string>
   <string name="DateUtils_yesterday">Ontem</string>
   <!--DeliveryStatus-->
@@ -413,6 +427,7 @@
   <string name="NotificationMmsMessageRecord_error_downloading_mms_message">Erro ao descarregar a mensagem MMS, toque para repetir</string>
   <!--MediaPickerActivity-->
   <string name="MediaPickerActivity_send_to">Enviar para %s</string>
+  <string name="MediaPickerActivity__menu_open_camera">Abrir câmara</string>
   <!--MediaPickerItemFragment-->
   <string name="MediaPickerItemFragment_tap_to_select">Tocar para selecionar</string>
   <!--MediaSendActivity-->
@@ -562,11 +577,14 @@ especificou (%s) é inválido.</string>
   <string name="RegistrationActivity_enter_your_phone_number_to_get_started">Para começar introduza o seu número de telefone</string>
   <string name="RegistrationActivity_you_will_receive_a_verification_code">Irá receber um código de verificação. Poderão existir custos por parte da sua operadora.</string>
   <string name="RegistrationActivity_enter_the_code_we_sent_to_s">Introduza o código que enviamos para %s</string>
+  <string name="RegistrationActivity_phone_number_description">Número de telefone</string>
+  <string name="RegistrationActivity_country_code_description">Código do país</string>
   <string name="RegistrationActivity_call">Telefonar</string>
   <!--RevealableMessageView-->
-  <string name="RevealableMessageView_view_photo">Ver fotografia</string>
-  <string name="RevealableMessageView_viewed">Vista(s)</string>
   <string name="RevealableMessageView_photo">Fotografia</string>
+  <string name="RevealableMessageView_video">Vídeo</string>
+  <string name="RevealableMessageView_viewed">Vista(s)</string>
+  <string name="RevealableMessageView_outgoing_media">Média</string>
   <!--ScribbleActivity-->
   <string name="ScribbleActivity_save_failure">Falha ao guardar as alterações da imagem</string>
   <!--Search-->
@@ -629,6 +647,7 @@ Mensagem de troca de chaves inválida para esta versão do protocolo.
   <string name="ThreadRecord_media_message">Mensagem multimédia</string>
   <string name="ThreadRecord_sticker">Autocolante</string>
   <string name="ThreadRecord_disappearing_photo">Destruição de fotografia</string>
+  <string name="ThreadRecord_disappearing_video">Destruição de vídeo</string>
   <string name="ThreadRecord_s_is_on_signal">%s está no Signal!</string>
   <string name="ThreadRecord_disappearing_messages_disabled">Destruição de mensagens desactivada</string>
   <string name="ThreadRecord_disappearing_message_time_updated_to_s">O tempo a decorrer até que as mensagens sejam destruídas está definido para %s</string>
@@ -663,6 +682,7 @@ Mensagem de troca de chaves inválida para esta versão do protocolo.
   <string name="VerifyIdentityActivity_no_safety_number_to_compare_was_found_in_the_clipboard">Não foi encontrado na área de transferência nenhum número de segurança com o qual comparar </string>
   <string name="VerifyIdentityActivity_signal_needs_the_camera_permission_in_order_to_scan_a_qr_code_but_it_has_been_permanently_denied">O Signal requer permissão de acesso à câmara para ler códigos QR, mas esta foi negada permanentemente. Por favor, aceda às definições da aplicação, seleccione \"Permissões\" e ative \"Câmara\".</string>
   <string name="VerifyIdentityActivity_unable_to_scan_qr_code_without_camera_permission">Não é possível ler um código QR sem permissão de acesso à câmara.</string>
+  <!--ViewOnceMessageActivity-->
   <!--MessageDisplayHelper-->
   <string name="MessageDisplayHelper_bad_encrypted_message">Mensagem encriptada corrompida</string>
   <string name="MessageDisplayHelper_message_encrypted_for_non_existing_session">Mensagem encriptada para sessão inexistente</string>
@@ -704,6 +724,7 @@ Mensagem de troca de chaves inválida para esta versão do protocolo.
   <string name="MessageNotifier_media_message">Mensagem multimédia</string>
   <string name="MessageNotifier_sticker">Autocolante</string>
   <string name="MessageNotifier_disappearing_photo">Destruição de fotografia</string>
+  <string name="MessageNotifier_disappearing_video">Destruição de vídeo</string>
   <string name="MessageNotifier_reply">Responder</string>
   <string name="MessageNotifier_signal_message">Mensagem do Signal</string>
   <string name="MessageNotifier_unsecured_sms">SMS inseguro</string>
@@ -757,10 +778,14 @@ Mensagem de troca de chaves inválida para esta versão do protocolo.
   <!--WebRtcCallControls-->
   <string name="WebRtcCallControls_tap_to_enable_your_video">Toque para ligar o vídeo</string>
   <!--WebRtcCallControls Content Descriptions-->
-  <string name="WebRtcCallControls_contact_photo_description">Foto de contacto</string>
-  <string name="WebRtcCallControls_speaker_button_description">Alta voz</string>
+  <string name="WebRtcCallControls_contact_photo_description">Fotografia do contacto</string>
+  <string name="WebRtcCallControls_speaker_button_description">Altifalante</string>
+  <string name="WebRtcCallControls_bluetooth_button_description">Bluetooth</string>
   <string name="WebRtcCallControls_mute_button_description">Silenciar</string>
+  <string name="WebRtcCallControls_your_camera_button_description">A sua câmara</string>
+  <string name="WebRtcCallControls_switch_to_rear_camera_button_description">Mudar para a câmara traseira</string>
   <string name="WebRtcCallControls_answer_call_description">Atender chamada</string>
+  <string name="WebRtcCallControls_reject_call_description">Rejeitar chamada</string>
   <!--attachment_type_selector-->
   <string name="attachment_type_selector__audio">Áudio</string>
   <string name="attachment_type_selector__audio_description">Áudio</string>
@@ -783,7 +808,11 @@ Mensagem de troca de chaves inválida para esta versão do protocolo.
   <string name="change_passphrase_activity__repeat_new_passphrase">Repita a frase-passe nova</string>
   <!--contact_selection_activity-->
   <string name="contact_selection_activity__enter_name_or_number">Introduza o nome ou número</string>
+  <string name="contact_selection_activity__invite_to_signal">Convite para o Signal</string>
   <!--contact_filter_toolbar-->
+  <string name="contact_filter_toolbar__clear_entered_text_description">Limpara o texto introduzido</string>
+  <string name="contact_filter_toolbar__show_keyboard_description">Exibir teclado</string>
+  <string name="contact_filter_toolbar__show_dial_pad_description">Exibir teclado de marcação</string>
   <!--contact_selection_group_activity-->
   <string name="contact_selection_group_activity__no_contacts">Sem contactos.</string>
   <string name="contact_selection_group_activity__finding_contacts">A carregar contactos…</string>
@@ -825,13 +854,13 @@ Mensagem de troca de chaves inválida para esta versão do protocolo.
   <!--conversation_item_received-->
   <string name="conversation_item_received__contact_photo_description">Foto de contacto</string>
   <!--audio_view-->
-  <string name="audio_view__play_accessibility_description">Reproduzir</string>
-  <string name="audio_view__pause_accessibility_description">Pausar</string>
+  <string name="audio_view__play_pause_accessibility_description">Play ... Pausa</string>
   <string name="audio_view__download_accessibility_description">Descarregar</string>
   <!--QuoteView-->
   <string name="QuoteView_audio">Áudio</string>
   <string name="QuoteView_video">Vídeo</string>
   <string name="QuoteView_photo">Foto</string>
+  <string name="QuoteView_media">Mensagem multimédia</string>
   <string name="QuoteView_sticker">Autocolante</string>
   <string name="QuoteView_document">Documento</string>
   <string name="QuoteView_you">Você</string>
@@ -923,8 +952,6 @@ Mensagem de troca de chaves inválida para esta versão do protocolo.
   <string name="database_migration_activity__import">Importar</string>
   <string name="database_migration_activity__this_could_take_a_moment_please_be_patient">Isto poderá demorar um pouco. Por favor, seja paciente. Será notificado quanto a importação estiver completa.</string>
   <string name="database_migration_activity__importing">A IMPORTAR</string>
-  <!--database_upgrade_activity-->
-  <string name="database_upgrade_activity__updating_database">A atualizar a base de dados...</string>
   <string name="import_fragment__import_system_sms_database">Importar a base de dados de SMS do sistema</string>
   <string name="import_fragment__import_the_database_from_the_default_system">Importar a base de dados da aplicação padrão de mensagens do sistema.</string>
   <string name="import_fragment__import_plaintext_backup">Importar cópia de segurança em texto simples</string>
@@ -1045,8 +1072,8 @@ Mensagem de troca de chaves inválida para esta versão do protocolo.
   <string name="arrays__max">Máxima</string>
   <!--plurals.xml-->
   <plurals name="hours_ago">
-    <item quantity="one">%d hora</item>
-    <item quantity="other">%d horas</item>
+    <item quantity="one">%dh</item>
+    <item quantity="other">%dh </item>
   </plurals>
   <!--preferences.xml-->
   <string name="preferences__sms_mms">SMS e MMS</string>
@@ -1115,6 +1142,7 @@ Mensagem de troca de chaves inválida para esta versão do protocolo.
   <string name="preferences__linked_devices">Dispositivos associados</string>
   <string name="preferences__light_theme">Claro</string>
   <string name="preferences__dark_theme">Escuro</string>
+  <string name="preferences__system_theme">Sistema</string>
   <string name="preferences__appearance">Aspeto</string>
   <string name="preferences__theme">Tema</string>
   <string name="preferences__default">Pré-definição</string>
@@ -1190,6 +1218,8 @@ Mensagem de troca de chaves inválida para esta versão do protocolo.
   <string name="conversation_list_batch_archive__menu_archive_selected">Arquivar selecionado(s)</string>
   <string name="conversation_list_batch_unarchive__menu_unarchive_selected">Desarquivar selecionado(s)</string>
   <!--conversation_list-->
+  <string name="conversation_list_settings_shortcut">Atalho para definições</string>
+  <string name="conversation_list_search_description">Procurar</string>
   <!--conversation_list_item_view-->
   <string name="conversation_list_item_view__contact_photo_image">Foto de contacto</string>
   <string name="conversation_list_item_view__archived">Arquivado</string>
@@ -1197,6 +1227,7 @@ Mensagem de troca de chaves inválida para esta versão do protocolo.
   <string name="conversation_list_item_inbox_zero__zip_zilch_zero_nada_nyou_re_all_caught_up">Zip. Népia. Zero. Nada.\nEstá completamente a par!</string>
   <!--conversation_list_fragment-->
   <string name="conversation_list_fragment__fab_content_description">Nova conversa</string>
+  <string name="conversation_list_fragment__open_camera_description">Abrir câmara</string>
   <string name="conversation_list_fragment__give_your_inbox_something_to_write_home_about_get_started_by_messaging_a_friend">Dê à sua caixa de entrada alguma escrita. Comece por enviar uma mensagem para um amigo.</string>
   <!--conversation_secure_verified-->
   <string name="conversation_secure_verified__menu_reset_secure_session">Reiniciar sessão segura</string>
@@ -1315,6 +1346,9 @@ Mensagem de troca de chaves inválida para esta versão do protocolo.
   <string name="RegistrationActivity_please_enter_the_verification_code_sent_to_s">Por favor, insira o código de verificação enviado para %s.</string>
   <string name="RegistrationActivity_wrong_number">Número errado</string>
   <string name="RegistrationActivity_call_me_instead_available_in">Como alternativa, ligue-me \n (Disponível às %1$02d:%2$02d)</string>
+  <string name="RegistrationActivity_contact_signal_support">Contactar o Suporte do Signal</string>
+  <string name="RegistrationActivity_code_support_subject">Registo Signal - Código de verificação para Android</string>
+  <string name="RegistrationActivity_code_support_body">Assunto: Registo Signal - Código de verificação para Android\nInformação de dispositivo: %1$s\nVersão do Android: %2$s\nVersão do Signal: %3$s\nLocal: %4$s</string>
   <string name="BackupUtil_never">Nunca</string>
   <string name="BackupUtil_unknown">Desconhecido</string>
   <string name="preferences_app_protection__screen_lock">Ecrã de bloqueio</string>

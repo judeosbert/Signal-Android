@@ -1,5 +1,10 @@
 package org.thoughtcrime.securesms.jobs;
 
+import android.graphics.Bitmap;
+import android.media.MediaDataSource;
+import android.media.MediaMetadataRetriever;
+import android.os.Build;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -9,6 +14,7 @@ import org.thoughtcrime.securesms.attachments.Attachment;
 import org.thoughtcrime.securesms.attachments.AttachmentId;
 import org.thoughtcrime.securesms.attachments.DatabaseAttachment;
 import org.thoughtcrime.securesms.attachments.PointerAttachment;
+import org.thoughtcrime.securesms.blurhash.BlurHashEncoder;
 import org.thoughtcrime.securesms.database.AttachmentDatabase;
 import org.thoughtcrime.securesms.database.DatabaseFactory;
 import org.thoughtcrime.securesms.dependencies.ApplicationDependencies;
@@ -17,11 +23,10 @@ import org.thoughtcrime.securesms.jobmanager.Data;
 import org.thoughtcrime.securesms.jobmanager.Job;
 import org.thoughtcrime.securesms.jobmanager.impl.NetworkConstraint;
 import org.thoughtcrime.securesms.logging.Log;
-import org.thoughtcrime.securesms.mms.MediaConstraints;
 import org.thoughtcrime.securesms.mms.PartAuthority;
 import org.thoughtcrime.securesms.service.GenericForegroundService;
 import org.thoughtcrime.securesms.service.NotificationController;
-import org.thoughtcrime.securesms.transport.UndeliverableMessageException;
+import org.thoughtcrime.securesms.util.MediaMetadataRetrieverUtil;
 import org.thoughtcrime.securesms.util.MediaUtil;
 import org.whispersystems.libsignal.util.guava.Optional;
 import org.whispersystems.signalservice.api.SignalServiceMessageSender;
@@ -32,11 +37,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 
-public class AttachmentUploadJob extends BaseJob {
+/**
+ * Uploads an attachment without alteration.
+ * <p>
+ * Queue {@link AttachmentCompressionJob} before to compress.
+ */
+public final class AttachmentUploadJob extends BaseJob {
 
-  public static final String KEY = "AttachmentUploadJob";
+  public static final String KEY = "AttachmentUploadJobV2";
 
-  private static final String TAG = AttachmentUploadJob.class.getSimpleName();
+  @SuppressWarnings("unused")
+  private static final String TAG = Log.tag(AttachmentUploadJob.class);
 
   private static final String KEY_ROW_ID    = "row_id";
   private static final String KEY_UNIQUE_ID = "unique_id";
@@ -46,26 +57,13 @@ public class AttachmentUploadJob extends BaseJob {
    */
   private static final int FOREGROUND_LIMIT = 10 * 1024 * 1024;
 
-  /**
-   * The {@link PartProgressEvent} on the {@link EventBus} is shared between transcoding and uploading.
-   * <p>
-   * This number is the ratio that represents the transcoding effort, after which it will hand
-   * over to the to complete the progress.
-   */
-  private static final double ENCODING_PROGRESS_RATIO = 0.75;
+  private final AttachmentId attachmentId;
 
-  private final AttachmentId               attachmentId;
-
-  public static AttachmentUploadJob fromAttachment(DatabaseAttachment databaseAttachment) {
-    return new AttachmentUploadJob(databaseAttachment.getAttachmentId(), MediaUtil.isVideo(databaseAttachment) && MediaConstraints.isVideoTranscodeAvailable());
-  }
-
-  private AttachmentUploadJob(AttachmentId attachmentId, boolean isVideoTranscode) {
+  public AttachmentUploadJob(AttachmentId attachmentId) {
     this(new Job.Parameters.Builder()
                            .addConstraint(NetworkConstraint.KEY)
                            .setLifespan(TimeUnit.DAYS.toMillis(1))
                            .setMaxAttempts(Parameters.UNLIMITED)
-                           .setQueue(isVideoTranscode ? "VIDEO_TRANSCODE" : null)
                            .build(),
          attachmentId);
   }
@@ -97,14 +95,11 @@ public class AttachmentUploadJob extends BaseJob {
       throw new InvalidAttachmentException("Cannot find the specified attachment.");
     }
 
-    MediaConstraints mediaConstraints       = MediaConstraints.getPushMediaConstraints();
-    Attachment       scaledAttachment       = scaleAndStripExif(database, mediaConstraints, databaseAttachment);
-    boolean          videoTranscodeOccurred = databaseAttachment != scaledAttachment && MediaUtil.isVideo(scaledAttachment);
-    double           progressStartPoint     = videoTranscodeOccurred ? ENCODING_PROGRESS_RATIO : 0;
+    Log.i(TAG, "Uploading attachment for message " + databaseAttachment.getMmsId() + " with ID " + databaseAttachment.getAttachmentId());
 
-    try (NotificationController notification = getNotificationForAttachment(scaledAttachment)) {
-      SignalServiceAttachment        localAttachment  = getAttachmentFor(scaledAttachment, notification, progressStartPoint);
-      SignalServiceAttachmentPointer remoteAttachment = messageSender.uploadAttachment(localAttachment.asStream(), databaseAttachment.isSticker());
+    try (NotificationController notification = getNotificationForAttachment(databaseAttachment)) {
+      SignalServiceAttachment        localAttachment  = getAttachmentFor(databaseAttachment, notification);
+      SignalServiceAttachmentPointer remoteAttachment = messageSender.uploadAttachment(localAttachment.asStream());
       Attachment                     attachment       = PointerAttachment.forPointer(Optional.of(remoteAttachment), null, databaseAttachment.getFastPreflightId()).get();
 
       database.updateAttachmentAfterUpload(databaseAttachment.getAttachmentId(), attachment);
@@ -127,56 +122,78 @@ public class AttachmentUploadJob extends BaseJob {
     return exception instanceof IOException;
   }
 
-  /**
-   * @param progressStartPoint A value from 0..1 that represents any progress already shown.
-   *                           The {@link PartProgressEvent} of this task will fit in the remaining
-   *                           1 - progressStartPoint.
-   */
-  private @NonNull SignalServiceAttachment getAttachmentFor(Attachment attachment, @Nullable NotificationController notification, double progressStartPoint)
-      throws InvalidAttachmentException
-  {
+  private @NonNull SignalServiceAttachment getAttachmentFor(Attachment attachment, @Nullable NotificationController notification) throws InvalidAttachmentException {
     try {
       if (attachment.getDataUri() == null || attachment.getSize() == 0) throw new IOException("Assertion failed, outgoing attachment has no data!");
       InputStream is = PartAuthority.getAttachmentStream(context, attachment.getDataUri());
-      return SignalServiceAttachment.newStreamBuilder()
-                                    .withStream(is)
-                                    .withContentType(attachment.getContentType())
-                                    .withLength(attachment.getSize())
-                                    .withFileName(attachment.getFileName())
-                                    .withVoiceNote(attachment.isVoiceNote())
-                                    .withWidth(attachment.getWidth())
-                                    .withHeight(attachment.getHeight())
-                                    .withCaption(attachment.getCaption())
-                                    .withListener((total, progress) -> {
-                                      long cumulativeProgress = (long) ((1.0 - progressStartPoint) * progress + total * progressStartPoint);
-                                      EventBus.getDefault().postSticky(new PartProgressEvent(attachment, total, cumulativeProgress));
-                                      if (notification != null) {
-                                        notification.setProgress(total, progress);
-                                      }
-                                    })
-                                    .build();
+      SignalServiceAttachment.Builder builder = SignalServiceAttachment.newStreamBuilder()
+                                                                       .withStream(is)
+                                                                       .withContentType(attachment.getContentType())
+                                                                       .withLength(attachment.getSize())
+                                                                       .withFileName(attachment.getFileName())
+                                                                       .withVoiceNote(attachment.isVoiceNote())
+                                                                       .withWidth(attachment.getWidth())
+                                                                       .withHeight(attachment.getHeight())
+                                                                       .withCaption(attachment.getCaption())
+                                                                       .withListener((total, progress) -> {
+                                                                         EventBus.getDefault().postSticky(new PartProgressEvent(attachment, PartProgressEvent.Type.NETWORK, total, progress));
+                                                                         if (notification != null) {
+                                                                           notification.setProgress(total, progress);
+                                                                         }
+                                                                       });
+      if (MediaUtil.isImageType(attachment.getContentType())) {
+        return builder.withBlurHash(getImageBlurHash(attachment)).build();
+      } else if (MediaUtil.isVideoType(attachment.getContentType())) {
+        return builder.withBlurHash(getVideoBlurHash(attachment)).build();
+      } else {
+        return builder.build();
+      }
+
     } catch (IOException ioe) {
       throw new InvalidAttachmentException(ioe);
     }
   }
 
-  private Attachment scaleAndStripExif(@NonNull AttachmentDatabase attachmentDatabase,
-                                       @NonNull MediaConstraints constraints,
-                                       @NonNull DatabaseAttachment attachment)
-      throws UndeliverableMessageException
-  {
-    MediaResizer mediaResizer = new MediaResizer(context, constraints);
+  private @Nullable String getImageBlurHash(@NonNull Attachment attachment) throws IOException {
+    if (attachment.getBlurHash() != null) return attachment.getBlurHash().getHash();
+    if (attachment.getDataUri() == null) return null;
 
-    MediaResizer.ProgressListener progressListener = (progress, total) -> {
-                                                       PartProgressEvent event = new PartProgressEvent(attachment,
-                                                                                                       total,
-                                                                                                       (long) (progress * ENCODING_PROGRESS_RATIO));
-                                                       EventBus.getDefault().postSticky(event);
-                                                     };
+    return BlurHashEncoder.encode(PartAuthority.getAttachmentStream(context, attachment.getDataUri()));
+  }
 
-    return mediaResizer.scaleAndStripExifToDatabase(attachmentDatabase,
-                                                    attachment,
-                                                    progressListener);
+  private @Nullable String getVideoBlurHash(@NonNull Attachment attachment) throws IOException {
+    if (attachment.getThumbnailUri() != null) {
+      return BlurHashEncoder.encode(PartAuthority.getAttachmentStream(context, attachment.getThumbnailUri()));
+    }
+
+    if (attachment.getBlurHash() != null) return attachment.getBlurHash().getHash();
+
+    if (Build.VERSION.SDK_INT < 23) {
+      Log.w(TAG, "Video thumbnails not supported...");
+      return null;
+    }
+
+    try (MediaDataSource dataSource = DatabaseFactory.getAttachmentDatabase(context).mediaDataSourceFor(attachmentId)) {
+      if (dataSource == null) return null;
+
+      MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+      MediaMetadataRetrieverUtil.setDataSource(retriever, dataSource);
+
+      Bitmap bitmap = retriever.getFrameAtTime(1000);
+
+      if (bitmap != null) {
+        Bitmap thumb = Bitmap.createScaledBitmap(bitmap, 100, 100, false);
+        bitmap.recycle();
+
+        Log.i(TAG, "Generated video thumbnail...");
+        String hash = BlurHashEncoder.encode(thumb);
+        thumb.recycle();
+
+        return hash;
+      } else {
+        return null;
+      }
+    }
   }
 
   private class InvalidAttachmentException extends Exception {

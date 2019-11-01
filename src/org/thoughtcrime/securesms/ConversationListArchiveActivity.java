@@ -10,7 +10,7 @@ import org.thoughtcrime.securesms.util.DynamicLanguage;
 import org.thoughtcrime.securesms.util.DynamicTheme;
 
 public class ConversationListArchiveActivity extends PassphraseRequiredActionBarActivity
-    implements ConversationListFragment.ConversationSelectedListener
+    implements ConversationListFragment.Controller
 {
 
   private final DynamicTheme    dynamicTheme    = new DynamicTheme();
@@ -54,14 +54,14 @@ public class ConversationListArchiveActivity extends PassphraseRequiredActionBar
   @Override
   public void onCreateConversation(long threadId, Recipient recipient, int distributionType, long lastSeenTime) {
     Intent intent = new Intent(this, ConversationActivity.class);
-    intent.putExtra(ConversationActivity.ADDRESS_EXTRA, recipient.getAddress());
+    intent.putExtra(ConversationActivity.RECIPIENT_EXTRA, recipient.getId());
     intent.putExtra(ConversationActivity.THREAD_ID_EXTRA, threadId);
     intent.putExtra(ConversationActivity.IS_ARCHIVED_EXTRA, true);
     intent.putExtra(ConversationActivity.DISTRIBUTION_TYPE_EXTRA, distributionType);
     intent.putExtra(ConversationActivity.LAST_SEEN_EXTRA, lastSeenTime);
 
     startActivity(intent);
-    overridePendingTransition(R.anim.slide_from_right, R.anim.fade_scale_out);
+    overridePendingTransition(R.anim.slide_from_end, R.anim.fade_scale_out);
   }
 
   @Override
@@ -69,4 +69,13 @@ public class ConversationListArchiveActivity extends PassphraseRequiredActionBar
     throw new AssertionError();
   }
 
+  @Override
+  public void onListScrolledToTop() {
+
+  }
+
+  @Override
+  public void onListScrolledAwayFromTop() {
+
+  }
 }

@@ -1,16 +1,27 @@
 package org.thoughtcrime.securesms.dependencies;
 
+import android.app.Application;
 import android.content.Context;
 
 import androidx.annotation.NonNull;
 
 import org.greenrobot.eventbus.EventBus;
 import org.thoughtcrime.securesms.BuildConfig;
+import org.thoughtcrime.securesms.IncomingMessageProcessor;
 import org.thoughtcrime.securesms.crypto.storage.SignalProtocolStoreImpl;
+import org.thoughtcrime.securesms.database.DatabaseFactory;
 import org.thoughtcrime.securesms.events.ReminderUpdateEvent;
+import org.thoughtcrime.securesms.gcm.MessageRetriever;
+import org.thoughtcrime.securesms.jobmanager.Job;
+import org.thoughtcrime.securesms.jobmanager.JobManager;
+import org.thoughtcrime.securesms.jobmanager.JobMigrator;
+import org.thoughtcrime.securesms.jobmanager.impl.JsonDataSerializer;
+import org.thoughtcrime.securesms.jobs.FastJobStorage;
+import org.thoughtcrime.securesms.jobs.JobManagerFactories;
 import org.thoughtcrime.securesms.logging.Log;
 import org.thoughtcrime.securesms.push.SecurityEventListener;
 import org.thoughtcrime.securesms.push.SignalServiceNetworkAccess;
+import org.thoughtcrime.securesms.recipients.LiveRecipientCache;
 import org.thoughtcrime.securesms.service.IncomingMessageObserver;
 import org.thoughtcrime.securesms.util.TextSecurePreferences;
 import org.whispersystems.libsignal.util.guava.Optional;
@@ -30,67 +41,74 @@ public class ApplicationDependencyProvider implements ApplicationDependencies.Pr
 
   private static final String TAG = Log.tag(ApplicationDependencyProvider.class);
 
-  private final Context                    context;
+  private final Application                context;
   private final SignalServiceNetworkAccess networkAccess;
 
-  private SignalServiceAccountManager  accountManager;
-  private SignalServiceMessageSender   messageSender;
-  private SignalServiceMessageReceiver messageReceiver;
-
-  public ApplicationDependencyProvider(@NonNull Context context, @NonNull SignalServiceNetworkAccess networkAccess) {
-    this.context       = context.getApplicationContext();
+  public ApplicationDependencyProvider(@NonNull Application context, @NonNull SignalServiceNetworkAccess networkAccess) {
+    this.context       = context;
     this.networkAccess = networkAccess;
   }
 
   @Override
-  public @NonNull SignalServiceAccountManager getSignalServiceAccountManager() {
-    if (accountManager == null) {
-      this.accountManager = new SignalServiceAccountManager(networkAccess.getConfiguration(context),
-          new DynamicCredentialsProvider(context),
-          BuildConfig.USER_AGENT);
-    }
-
-    return accountManager;
+  public @NonNull SignalServiceAccountManager provideSignalServiceAccountManager() {
+    return new SignalServiceAccountManager(networkAccess.getConfiguration(context),
+                                           new DynamicCredentialsProvider(context),
+                                           BuildConfig.USER_AGENT);
   }
 
   @Override
-  public @NonNull SignalServiceMessageSender getSignalServiceMessageSender() {
-    if (this.messageSender == null) {
-      this.messageSender = new SignalServiceMessageSender(networkAccess.getConfiguration(context),
-                                                          new DynamicCredentialsProvider(context),
-                                                          new SignalProtocolStoreImpl(context),
-                                                          BuildConfig.USER_AGENT,
-                                                          TextSecurePreferences.isMultiDevice(context),
-                                                          Optional.fromNullable(IncomingMessageObserver.getPipe()),
-                                                          Optional.fromNullable(IncomingMessageObserver.getUnidentifiedPipe()),
-                                                          Optional.of(new SecurityEventListener(context)));
-    }else {
-      this.messageSender.setMessagePipe(IncomingMessageObserver.getPipe(), IncomingMessageObserver.getUnidentifiedPipe());
-      this.messageSender.setIsMultiDevice(TextSecurePreferences.isMultiDevice(context));
-    }
-
-    return this.messageSender;
+  public @NonNull SignalServiceMessageSender provideSignalServiceMessageSender() {
+      return new SignalServiceMessageSender(networkAccess.getConfiguration(context),
+                                            new DynamicCredentialsProvider(context),
+                                            new SignalProtocolStoreImpl(context),
+                                            BuildConfig.USER_AGENT,
+                                            TextSecurePreferences.isMultiDevice(context),
+                                            Optional.fromNullable(IncomingMessageObserver.getPipe()),
+                                            Optional.fromNullable(IncomingMessageObserver.getUnidentifiedPipe()),
+                                            Optional.of(new SecurityEventListener(context)));
   }
 
   @Override
-  public @NonNull SignalServiceMessageReceiver getSignalServiceMessageReceiver() {
-    if (this.messageReceiver == null) {
-      SleepTimer sleepTimer = TextSecurePreferences.isFcmDisabled(context) ? new RealtimeSleepTimer(context)
-                                                                           : new UptimeSleepTimer();
-
-      this.messageReceiver = new SignalServiceMessageReceiver(networkAccess.getConfiguration(context),
-                                                              new DynamicCredentialsProvider(context),
-                                                              BuildConfig.USER_AGENT,
-                                                              new PipeConnectivityListener(),
-                                                              sleepTimer);
-    }
-
-    return this.messageReceiver;
+  public @NonNull SignalServiceMessageReceiver provideSignalServiceMessageReceiver() {
+    SleepTimer sleepTimer = TextSecurePreferences.isFcmDisabled(context) ? new RealtimeSleepTimer(context)
+                                                                         : new UptimeSleepTimer();
+    return new SignalServiceMessageReceiver(networkAccess.getConfiguration(context),
+                                            new DynamicCredentialsProvider(context),
+                                            BuildConfig.USER_AGENT,
+                                            new PipeConnectivityListener(),
+                                            sleepTimer);
   }
 
   @Override
-  public @NonNull SignalServiceNetworkAccess getSignalServiceNetworkAccess() {
+  public @NonNull SignalServiceNetworkAccess provideSignalServiceNetworkAccess() {
     return networkAccess;
+  }
+
+  @Override
+  public @NonNull IncomingMessageProcessor provideIncomingMessageProcessor() {
+    return new IncomingMessageProcessor(context);
+  }
+
+  @Override
+  public @NonNull MessageRetriever provideMessageRetriever() {
+    return new MessageRetriever();
+  }
+
+  @Override
+  public @NonNull LiveRecipientCache provideRecipientCache() {
+    return new LiveRecipientCache(context);
+  }
+
+  @Override
+  public @NonNull JobManager provideJobManager() {
+    return new JobManager(context, new JobManager.Configuration.Builder()
+                                                               .setDataSerializer(new JsonDataSerializer())
+                                                               .setJobFactories(JobManagerFactories.getJobFactories(context))
+                                                               .setConstraintFactories(JobManagerFactories.getConstraintFactories(context))
+                                                               .setConstraintObservers(JobManagerFactories.getConstraintObservers(context))
+                                                               .setJobStorage(new FastJobStorage(DatabaseFactory.getJobDatabase(context)))
+                                                               .setJobMigrator(new JobMigrator(TextSecurePreferences.getJobManagerVersion(context), JobManager.CURRENT_VERSION, JobManagerFactories.getJobMigrations(context)))
+                                                               .build());
   }
 
   private static class DynamicCredentialsProvider implements CredentialsProvider {

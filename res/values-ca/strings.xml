@@ -11,6 +11,8 @@
   <string name="AbstractNotificationBuilder_new_message">Missatge nou</string>
   <!--AlbumThumbnailView-->
   <string name="AlbumThumbnailView_plus">\+%d</string>
+  <!--ApplicationMigrationActivity-->
+  <string name="ApplicationMigrationActivity__signal_is_updating">S\'actualitza el Signal...</string>
   <!--ApplicationPreferencesActivity-->
   <string name="ApplicationPreferencesActivity_currently_s">Actualment: %s</string>
   <string name="ApplicationPreferenceActivity_you_havent_set_a_passphrase_yet">Encara no heu establert cap contrasenya.</string>
@@ -77,6 +79,7 @@
   <!--CameraActivity-->
   <string name="CameraActivity_image_save_failure">No s\'ha pogut desar la imatge.</string>
   <!--CameraXFragment-->
+  <string name="CameraXFragment_tap_for_photo_hold_for_video">Un toc per fer una fotografia, pressió contínua per fer vídeo</string>
   <string name="CameraXFragment_capture_description">Captura</string>
   <string name="CameraXFragment_change_camera_description">Canvia la càmera</string>
   <string name="CameraXFragment_open_gallery_description">Obre la galeria</string>
@@ -174,6 +177,9 @@
   <string name="ConversationActivity_to_capture_photos_and_video_allow_signal_access_to_the_camera">Per captar fotografies i vídeos, permeteu que el Signal tingui accés a la càmera.</string>
   <string name="ConversationActivity_signal_needs_the_camera_permission_to_take_photos_or_video">El Signal necessita el permís de la càmera per tal de fer fotografies i vídeos, però s\'ha denegat permanentment. Si us plau, continueu cap al menú de configuració de l\'aplicació, seleccioneu Permisos i habiliteu-hi la càmera.</string>
   <string name="ConversationActivity_signal_needs_camera_permissions_to_take_photos_or_video">El Signal necessita el permís de la càmera per fer fotografies i vídeos.</string>
+  <string name="ConversationActivity_enable_the_microphone_permission_to_capture_videos_with_sound">Habiliteu el permís del micròfon per capturar vídeos amb so.</string>
+  <string name="ConversationActivity_signal_needs_the_recording_permissions_to_capture_video">El Signal necessita el permís del micròfon per gravar vídeos, però s\'han denegat. Si us plau, continueu cap al menú de configuració de l\'aplicació, seleccioneu Permisos i habiliteu-hi el micròfon i la càmera.</string>
+  <string name="ConversationActivity_signal_needs_recording_permissions_to_capture_video">El Signal necessita el permís del telèfon per gravar vídeos.</string>
   <string name="ConversationActivity_quoted_contact_message">%1$s %2$s</string>
   <string name="ConversationActivity_signal_cannot_sent_sms_mms_messages_because_it_is_not_your_default_sms_app">El Signal no pot enviar missatges SMS / MMS perquè no és la vostra aplicació d\'SMS predeterminada. Voleu canviar-ho a la configuració d\'Android?</string>
   <string name="ConversationActivity_yes">Sí</string>
@@ -222,6 +228,9 @@
   <string name="ConversationFragment_deleting_messages">Suprimint missatges...</string>
   <string name="ConversationFragment_quoted_message_not_found">No s\'ha trobat el missatge original.</string>
   <string name="ConversationFragment_quoted_message_no_longer_available">El missatge original ja no està disponible.</string>
+  <string name="ConversationFragment_failed_to_open_message">Ha fallat obrir el missatge.</string>
+  <string name="ConversationFragment_you_can_swipe_to_the_right_reply">Podeu lliscar cap a la dreta en qualsevol missatge per respondre ràpidament.</string>
+  <string name="ConversationFragment_you_can_swipe_to_the_left_reply">Podeu lliscar cap a l’esquerra en qualsevol missatge per respondre ràpidament.</string>
   <!--ConversationListActivity-->
   <string name="ConversationListActivity_there_is_no_browser_installed_on_your_device">No hi ha cap navegador instal·lat al dispositiu.</string>
   <!--ConversationListFragment-->
@@ -568,11 +577,14 @@ especificat (%s) no és vàlid.</string>
   <string name="RegistrationActivity_enter_your_phone_number_to_get_started">Per començar, introduïu el número de telèfon.</string>
   <string name="RegistrationActivity_you_will_receive_a_verification_code">Rebreu un codi de verificació. La vostra operadora podria aplicar algun càrrec.</string>
   <string name="RegistrationActivity_enter_the_code_we_sent_to_s">Introduïu el codi que hem enviat a %s</string>
+  <string name="RegistrationActivity_phone_number_description">Número de telèfon</string>
+  <string name="RegistrationActivity_country_code_description">Codi de país</string>
   <string name="RegistrationActivity_call">Truca</string>
   <!--RevealableMessageView-->
-  <string name="RevealableMessageView_view_photo">Mostra la fotografia</string>
-  <string name="RevealableMessageView_viewed">Vista</string>
   <string name="RevealableMessageView_photo">Foto</string>
+  <string name="RevealableMessageView_video">Vídeo</string>
+  <string name="RevealableMessageView_viewed">Vista</string>
+  <string name="RevealableMessageView_outgoing_media">Contingut</string>
   <!--ScribbleActivity-->
   <string name="ScribbleActivity_save_failure">No s\'ha pogut desar els canvis en la imatge</string>
   <!--Search-->
@@ -633,6 +645,7 @@ S\'ha rebut un missatge d\'intercanvi de claus per a una versió del protocol no
   <string name="ThreadRecord_media_message">Missatge multimèdia</string>
   <string name="ThreadRecord_sticker">Adhesiu</string>
   <string name="ThreadRecord_disappearing_photo">Fotografia efímera</string>
+  <string name="ThreadRecord_disappearing_video">Vídeo efímer</string>
   <string name="ThreadRecord_s_is_on_signal">%s és al Signal!</string>
   <string name="ThreadRecord_disappearing_messages_disabled">Missatges efímers inhabilitats</string>
   <string name="ThreadRecord_disappearing_message_time_updated_to_s">El temps del missatge efímer s\'ha establit a %s</string>
@@ -667,6 +680,7 @@ S\'ha rebut un missatge d\'intercanvi de claus per a una versió del protocol no
   <string name="VerifyIdentityActivity_no_safety_number_to_compare_was_found_in_the_clipboard">No s\'ha trobat cap número de seguretat al porta-retalls</string>
   <string name="VerifyIdentityActivity_signal_needs_the_camera_permission_in_order_to_scan_a_qr_code_but_it_has_been_permanently_denied">El Signal necessita el permís de la càmera per tal d\'escanejar un codi QR, però s\'ha denegat permanentment. Si us plau, continueu cap al menú de configuració de l\'aplicació, seleccioneu Permisos i habiliteu-hi la càmera.</string>
   <string name="VerifyIdentityActivity_unable_to_scan_qr_code_without_camera_permission">No es pot escanejar un codi QR sense permís de la càmera.</string>
+  <!--ViewOnceMessageActivity-->
   <!--MessageDisplayHelper-->
   <string name="MessageDisplayHelper_bad_encrypted_message">Missatge mal encriptat</string>
   <string name="MessageDisplayHelper_message_encrypted_for_non_existing_session">Missatge encriptat per a una sessió que no existeix</string>
@@ -708,6 +722,7 @@ S\'ha rebut un missatge d\'intercanvi de claus per a una versió del protocol no
   <string name="MessageNotifier_media_message">Missatge multimèdia</string>
   <string name="MessageNotifier_sticker">Adhesiu</string>
   <string name="MessageNotifier_disappearing_photo">Fotografia efímera</string>
+  <string name="MessageNotifier_disappearing_video">Vídeo efímer</string>
   <string name="MessageNotifier_reply">Respon</string>
   <string name="MessageNotifier_signal_message">Missatge del Signal</string>
   <string name="MessageNotifier_unsecured_sms">SMS no segur</string>
@@ -791,6 +806,7 @@ S\'ha rebut un missatge d\'intercanvi de claus per a una versió del protocol no
   <string name="change_passphrase_activity__repeat_new_passphrase">Repetiu la contrasenya nova</string>
   <!--contact_selection_activity-->
   <string name="contact_selection_activity__enter_name_or_number">Introduïu un nom o número</string>
+  <string name="contact_selection_activity__invite_to_signal">Convida al Signal</string>
   <!--contact_filter_toolbar-->
   <string name="contact_filter_toolbar__clear_entered_text_description">Neteja el text introduït</string>
   <string name="contact_filter_toolbar__show_keyboard_description">Mostra el teclat</string>
@@ -836,13 +852,13 @@ S\'ha rebut un missatge d\'intercanvi de claus per a una versió del protocol no
   <!--conversation_item_received-->
   <string name="conversation_item_received__contact_photo_description">Foto del contacte</string>
   <!--audio_view-->
-  <string name="audio_view__play_accessibility_description">Reprodueix</string>
-  <string name="audio_view__pause_accessibility_description">Pausa</string>
+  <string name="audio_view__play_pause_accessibility_description">Reprodueix... Pausa</string>
   <string name="audio_view__download_accessibility_description">Baixa</string>
   <!--QuoteView-->
   <string name="QuoteView_audio">Àudio</string>
   <string name="QuoteView_video">Vídeo</string>
   <string name="QuoteView_photo">Foto</string>
+  <string name="QuoteView_media">Missatge multimèdia</string>
   <string name="QuoteView_sticker">Adhesiu</string>
   <string name="QuoteView_document">Document</string>
   <string name="QuoteView_you">Jo</string>
@@ -934,8 +950,6 @@ S\'ha rebut un missatge d\'intercanvi de claus per a una versió del protocol no
   <string name="database_migration_activity__import">Importa</string>
   <string name="database_migration_activity__this_could_take_a_moment_please_be_patient">Això pot trigar una mica. Tingueu paciència, us notificarem quan la importació hagi finalitzat.</string>
   <string name="database_migration_activity__importing">S\'ESTÀ IMPORTANT</string>
-  <!--database_upgrade_activity-->
-  <string name="database_upgrade_activity__updating_database">S\'està actualitzant la base de dades...</string>
   <string name="import_fragment__import_system_sms_database">Importa base de dades d\'SMS del sistema</string>
   <string name="import_fragment__import_the_database_from_the_default_system">Importa la base de dades del programa de missatgeria predeterminat del sistema</string>
   <string name="import_fragment__import_plaintext_backup">Importa la còpia de seguretat en text pla</string>
@@ -1056,8 +1070,8 @@ S\'ha rebut un missatge d\'intercanvi de claus per a una versió del protocol no
   <string name="arrays__max">Màxima</string>
   <!--plurals.xml-->
   <plurals name="hours_ago">
-    <item quantity="one">%d hora</item>
-    <item quantity="other">%d hores</item>
+    <item quantity="one">%dh</item>
+    <item quantity="other">%dh</item>
   </plurals>
   <!--preferences.xml-->
   <string name="preferences__sms_mms">SMS i MMS</string>
@@ -1126,6 +1140,7 @@ S\'ha rebut un missatge d\'intercanvi de claus per a una versió del protocol no
   <string name="preferences__linked_devices">Dispositius enllaçats</string>
   <string name="preferences__light_theme">Clar</string>
   <string name="preferences__dark_theme">Fosc</string>
+  <string name="preferences__system_theme">Sistema</string>
   <string name="preferences__appearance">Aparença</string>
   <string name="preferences__theme">Tema</string>
   <string name="preferences__default">Per defecte</string>
@@ -1202,6 +1217,7 @@ S\'ha rebut un missatge d\'intercanvi de claus per a una versió del protocol no
   <string name="conversation_list_batch_unarchive__menu_unarchive_selected">No arxivis la selecció</string>
   <!--conversation_list-->
   <string name="conversation_list_settings_shortcut">Drecera de configuració</string>
+  <string name="conversation_list_search_description">Cerca</string>
   <!--conversation_list_item_view-->
   <string name="conversation_list_item_view__contact_photo_image">Foto del contacte</string>
   <string name="conversation_list_item_view__archived">Arxivat</string>
@@ -1328,6 +1344,9 @@ S\'ha rebut un missatge d\'intercanvi de claus per a una versió del protocol no
   <string name="RegistrationActivity_please_enter_the_verification_code_sent_to_s">Si us plau, escriviu el codi de verificació enviat a %s.</string>
   <string name="RegistrationActivity_wrong_number">Número no correcte</string>
   <string name="RegistrationActivity_call_me_instead_available_in">Millor que em truquis.\n (Disponible d\'aquí a %1$02d:%2$02d)</string>
+  <string name="RegistrationActivity_contact_signal_support">Contacteu amb el suport de Signal</string>
+  <string name="RegistrationActivity_code_support_subject">Registre del Signal - Codi de verificació per a Android</string>
+  <string name="RegistrationActivity_code_support_body">Assumpte: registre del Signal - codi de verificació per a Android\nInformació del dispositiu: %1$s\nVersió d\'Android: %2$s\nVersió del Signal: %3$s\nLlengua: %4$s</string>
   <string name="BackupUtil_never">Mai</string>
   <string name="BackupUtil_unknown">Desconegut</string>
   <string name="preferences_app_protection__screen_lock">Bloqueig de pantalla</string>
